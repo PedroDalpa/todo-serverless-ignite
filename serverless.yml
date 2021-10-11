@@ -35,11 +35,11 @@ provider:
       Resource: "*"
 
 functions:
-  generateCertificate:
-    handler: src/functions/generateCertificate.handle
+  createTodo:
+    handler: src/functions/createTodo.handle
     events:
       - http:
-          path: /generateCertificate
+          path: /todo/{user_id}
           method: POST
           cors: true
     iamRoleStatements:
@@ -47,32 +47,32 @@ functions:
         Action:
           - dynamodb:Query
           - dynamodb:PutItem
-        Resource: "arn:aws:dynamodb:${self.provider.region}:*:table/users_certificates"
-  verifyCertificate:
-    handler: src/functions/verifyCertificate.handle
+        Resource: "arn:aws:dynamodb:${self.provider.region}:*:table/users_todos"
+  showTodo:
+    handler: src/functions/showTodo.handle
     events:
       - http:
-          path: /verifyCertificate/{id}
+          path: /todo/{user_id}
           method: GET
           cors: true
     iamRoleStatements:
       - Effect: Allow
         Action:
           - dynamodb:Query
-        Resource: "arn:aws:dynamodb:${self.provider.region}:*:table/users_certificates"
+        Resource: "arn:aws:dynamodb:${self.provider.region}:*:table/users_todos"
 
 resources:
   Resources:
     dbCertificateUsers:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: users_certificates
+        TableName: users_todos
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
         AttributeDefinitions:
-          - AttributeName: id
+          - AttributeName: user_id
             AttributeType: S
         KeySchema:
-          - AttributeName: id
+          - AttributeName: user_id
             KeyType: HASH
